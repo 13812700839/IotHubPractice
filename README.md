@@ -1,0 +1,4 @@
+练习搭建lotHub平台
+
+lotHub_Server为服务端
+lotHub_DeviceSDK为设备端
