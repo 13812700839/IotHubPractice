@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "jsonwebtoken": "^8.5.1",
     "mqtt": "^2.18.8"
   }
 }
