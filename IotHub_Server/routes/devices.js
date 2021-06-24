@@ -9,7 +9,13 @@ router.post("/", function (req, res){
     var productName = req.body.product_name
     var deviceName = shortid.generate();
     var secret = shortid.generate();
-    var brokerUsername = `${productName}/${deviceName}`
+    // var brokerUsername = `${productName}/${deviceName}`
+    var brokerUsername = productName+'/'+deviceName
+
+    console.log(productName)
+    console.log(deviceName)
+    console.log(secret)
+    console.log(brokerUsername)
 
     var device = new Device({
         product_name: productName,

@@ -14,8 +14,8 @@ var password = jwt.sign({
     username: "jwt_user",
     exp: Math.floor(Date.now() / 1000) + 10
 }, "emqxsecret")
-// var client = mqtt.connect('mqtt://127.0.0.1:1883', {
-var client = mqtt.connect('mqtt://10.40.250.101:1883', {
+var client = mqtt.connect('mqtt://127.0.0.1:1883', {
+// var client = mqtt.connect('mqtt://10.40.250.101:1883', {
     username: "jwt_user",
     password: password
 })
