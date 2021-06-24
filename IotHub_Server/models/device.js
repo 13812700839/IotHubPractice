@@ -26,4 +26,13 @@ const deviceSchema = new Schema({
     }
 })
 
+// 定义 device.toJSONObject
+deviceSchema.methods.toJSONObject = function() {
+    return {
+        product_name: this.product_name,
+        device_name: this.device_name,
+        secret: this.secret
+    }
+}
+
 module.exports = mongoose.model('devices', deviceSchema)
