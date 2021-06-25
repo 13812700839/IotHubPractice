@@ -13,7 +13,7 @@ var device = new IotDevice({
 
 device.on("online", function () {
     console.log("device is online")
-    device.disconnect()
+    // device.disconnect()
 })
 
 device.on("offline", function () {
