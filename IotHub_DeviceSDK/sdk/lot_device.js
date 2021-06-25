@@ -4,9 +4,11 @@ var mqtt = require('mqtt')
 const EventEmitter = require('events');
 
 class IotDevice extends EventEmitter {
-    constructor({serverAddress = "127.0.0.1:8883", productName, deviceName, secret} = {}) {
+    // constructor({serverAddress = "127.0.0.1:8883", productName, deviceName, secret} = {}) {
+    constructor({serverAddress = "10.40.250.101:8883", productName, deviceName, secret} = {}) {
         super();
         // this.serverAddress = `mqtt://${serverAddress}`
+        // this.serverAddress = 'mqtt://'+serverAddress
         this.serverAddress = 'mqtts://'+serverAddress
         this.productName = productName
         this.deviceName = deviceName
