@@ -4,8 +4,8 @@ var mqtt = require('mqtt')
 const EventEmitter = require('events');
 
 class IotDevice extends EventEmitter {
-    // constructor({serverAddress = "127.0.0.1:8883", productName, deviceName, secret} = {}) {
-    constructor({serverAddress = "10.40.250.101:8883", productName, deviceName, secret} = {}) {
+    // constructor({serverAddress = "127.0.0.1:8883", productName, deviceName, secret, clientID} = {}) {
+    constructor({serverAddress = "10.40.250.101:8883", productName, deviceName, secret, clientID} = {}) {
         super();
         // this.serverAddress = `mqtt://${serverAddress}`
         // this.serverAddress = 'mqtt://'+serverAddress
@@ -15,13 +15,20 @@ class IotDevice extends EventEmitter {
         this.secret = secret
         // this.username = `${this.productName}/${this.deviceName}`
         this.username = this.productName+'/'+this.deviceName
+        // 根据ClientID设置
+        // if (clientID!=null) this.clientIdentifier = `${this.username}/${clientID}`
+        if (clientID!=null) this.clientIdentifier = this.username+'/'+clientID
+        else this.clientIdentifier = this.username
     }
 
     connect() {
         this.client = mqtt.connect(this.serverAddress, {
             rejectUnauthorized: false,
             username: this.username,
-            password: this.secret
+            password: this.secret,
+            // 设置ClientID 和 clean session
+            clientId: this.clientIdentifier,
+            clean: false
         })
         var self = this
         this.client.on("connect", function () {
