@@ -3,6 +3,7 @@
 var Device = require('../models/device')
 var shortid = require('shortid')
 var express = require('express')
+var Connection = require('../models/connection')
 var router = express.Router()
 
 // Server API：设备注册
@@ -36,7 +37,15 @@ router.get("/:productName/:deviceName", function(req, res) {
     Device.findOne({"product_name": productName, "device_name": deviceName}, function(err, device) {
         if (err) res.send(err)
         else {
-            if (device!=null) res.json(device.toJSONObject())
+            if (device!=null) {
+                Connection.find({device: device._id}, function (_, connections) {
+                    res.json(Object.assign(device.toJSONObject(), {
+                        connections: connections.map(function (conn) {
+                            return conn.toJSONObject()
+                        })
+                    }))
+                })
+            }
             else res.status(404).json({error: "Not Found"})
         }
     })
