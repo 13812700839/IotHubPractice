@@ -13,9 +13,9 @@ var password = jwt.sign(
   process.env.JWT_SECRET
 );
 
-var client = mqtt.connect("mqtt://10.40.250.101:1883", {
+var client = mqtt.connect(process.env.MQTT_URL, {
   username: "jwt_user",
-  password: password,
+  password: password
 });
 
 client.on("connect", function () {

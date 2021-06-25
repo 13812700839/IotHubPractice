@@ -7,7 +7,7 @@ var path = require("path")
 var cookieParser = require("cookie-parser")
 var logger = require("morgan")
 
-// MongoDB的ORM
+// MongoDB的 ORM
 var mongoose = require("mongoose")
 mongoose
   .connect(process.env.MONGODB_URL, {
@@ -24,6 +24,8 @@ var usersRouter = require("./routes/users")
 var deviceRouter = require("./routes/devices")
 // 把routes/tokens.js挂载在/tokens下
 var tokensRouter = require('./routes/tokens')
+// 把routes/emqx_web_hook.js挂载在/emqx_web_hook下
+var webHookRouter = require('./routes/emqx_web_hook')
 
 var app = express()
 
@@ -42,6 +44,7 @@ app.use("/users", usersRouter)
 
 app.use("/devices", deviceRouter)
 app.use('/tokens', tokensRouter)
+app.use('/emqx_web_hook', webHookRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
