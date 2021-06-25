@@ -13,11 +13,6 @@ router.post("/", function (req, res){
     // var brokerUsername = `${productName}/${deviceName}`
     var brokerUsername = productName+'/'+deviceName
 
-    console.log(productName)
-    console.log(deviceName)
-    console.log(secret)
-    console.log(brokerUsername)
-
     var device = new Device({
         product_name: productName,
         device_name: deviceName,

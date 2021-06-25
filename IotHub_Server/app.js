@@ -1,4 +1,5 @@
 // app.js
+require('dotenv').config()
 
 var createError = require("http-errors")
 var express = require("express")
@@ -9,8 +10,7 @@ var logger = require("morgan")
 // MongoDB的ORM
 var mongoose = require("mongoose")
 mongoose
-  // .connect("mongodb://iot:iot@localhost:27017/iothub?authSource=admin", {
-  .connect("mongodb://iot:iot@10.40.250.101:27017/iothub?authSource=admin", {
+  .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

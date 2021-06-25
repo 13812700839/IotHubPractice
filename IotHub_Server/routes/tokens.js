@@ -6,7 +6,7 @@ var shortid = require('shortid')
 var jwt = require('jsonwebtoken')
 
 // 这个值应该与EMQ X etc/plugins/emqx_auth_jwt.conf 中保持一致
-const jwtSecret = 'emqxsecret'
+const jwtSecret = process.env.JWT_SECRET
 
 router.post('/', function (_, res) { 
     var username = shortid.generate()
