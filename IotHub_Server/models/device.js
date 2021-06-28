@@ -84,6 +84,11 @@ deviceSchema.methods.disconnect = function () {
     })
 }
 
+deviceSchema.post('remove', function (device, next) { 
+    Connection.deleteMany({device: device._id}).exec()
+    next()
+})
+
 const Device = mongoose.model('devices', deviceSchema)
 
 module.exports = Device

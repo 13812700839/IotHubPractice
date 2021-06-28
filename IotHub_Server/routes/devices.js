@@ -86,4 +86,20 @@ router.put('/:productName/:deviceName/resume', function (req, res){
     })
 })
 
+// 设备删除
+router.delete('/:productName/:deviceName', function (req, res){
+    var productName = req.params.productName
+    var deviceName = req.params.deviceName
+    Device.findOne({"product_name": productName, "device_name": deviceName}).exec(function (err, device) {  
+        if (err) res.send(err)
+        else {
+            if (device !=null){
+                device.remove()
+                device.disconnect()
+                res.status(200).send("ok")
+            } else res.status(404).json({error: "Not Found"})
+        }
+    })
+})
+
 module.exports = router

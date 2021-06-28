@@ -15,7 +15,6 @@ class EMQXService {
         // v4
         // const apiUrl = `${process.env.EMQX_API_URL}/clients/${clientid}`
         const apiUrl = process.env.EMQX_API_URL+'/clients/'+clientid
-        console.log(apiUrl)
         request.delete(apiUrl, {
             'auth': {
                 'user': process.env.EMQX_APP_ID,
