@@ -4,6 +4,7 @@ var mongoose = require('mongoose')
 var emqxService = require('../services/emqx_service')
 var Schema = mongoose.Schema
 var Connection = require('./connection')
+const DeviceACL = require('./device_acl')
 
 const deviceSchema = new Schema({
     // ProductName
@@ -86,8 +87,20 @@ deviceSchema.methods.disconnect = function () {
 
 deviceSchema.post('remove', function (device, next) { 
     Connection.deleteMany({device: device._id}).exec()
+    DeviceACL.deleteMany({broker_username: device.broker_username}).exec()
     next()
 })
+
+deviceSchema.methods.getACLRule = function () {  
+    const public = []
+    const subscribe = []
+    const pubsub = []
+    return {
+        publish: publish,
+        subscribe: subscribe,
+        pubsub: pubsub
+    }
+}
 
 const Device = mongoose.model('devices', deviceSchema)
 

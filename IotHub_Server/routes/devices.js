@@ -4,6 +4,7 @@ var Device = require('../models/device')
 var shortid = require('shortid')
 var express = require('express')
 var Connection = require('../models/connection')
+var DeviceACL = require('../models/device_acl')
 var router = express.Router()
 
 // Server API：设备注册
@@ -24,7 +25,18 @@ router.post("/", function (req, res){
 
     device.save(function (err) {
         if (err) res.status(500).send(err)
-        else res.json({product_name: productName, device_name: deviceName, secret: secret})
+        else {
+            var aclRule = device.getACLRule()
+            var deviceACL = new DeviceACL({
+                broker_username: device.brokerUsername,
+                publish: aclRule.publish,
+                subscribe: aclRule.subscribe,
+                pubsub: aclRule.pubsub
+            })
+            deviceACL.save(function () {  
+                res.json({product_name: productName, device_name: deviceName, secret: secret})
+            })
+        }
     })
 })
 
