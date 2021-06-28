@@ -12,20 +12,19 @@ router.post("/", function (req, res){
     var deviceName = shortid.generate();
     var secret = shortid.generate();
     // var brokerUsername = `${productName}/${deviceName}`
-    var brokerUsername = productName+'/'+deviceName
+    var brokerUsername = productName+'_'+deviceName
 
     var device = new Device({
         product_name: productName,
         device_name: deviceName,
         secret: secret,
-        broker_username: brokerUsername
+        broker_username: brokerUsername,
+        status: 'active'
     })
 
     device.save(function (err) {
-        if (err)
-            res.status(500).send(err)
-        else
-            res.json({product_name: productName, device_name: deviceName, secret: secret})
+        if (err) res.status(500).send(err)
+        else res.json({product_name: productName, device_name: deviceName, secret: secret})
     })
 })
 
@@ -59,6 +58,31 @@ router.get("/:productName", function(req, res) {
         else res.json(devices.map(function(device) {
             return device.toJSONObject()
         }))
+    })
+})
+
+// 禁用设备
+router.put('/:productName/:deviceName/suspend', function (req, res){
+    var productName = req.params.productName
+    var deviceName = req.params.deviceName
+    Device.findOneAndUpdate({"product_name": productName, "device_name": deviceName}, 
+    {status: "suspended"}, {useFindAndModify: false}).exec(function (err, device){
+        if (err) res.send(err)
+        else{
+            if (device != null) device.disconnect()
+            res.status(200).send("ok")
+        }
+    })
+})
+
+// 恢复设备
+router.put('/:productName/:deviceName/resume', function (req, res){
+    var productName = req.params.productName
+    var deviceName = req.params.deviceName
+    Device.findOneAndUpdate({"product_name": productName, "device_name": deviceName}, 
+    {status: "active"}, {useFindAndModify: false}, function (err) {  
+        if (err) res.send(err)
+        else res.status(200).send('ok')
     })
 })
 

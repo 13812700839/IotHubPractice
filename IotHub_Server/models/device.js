@@ -1,6 +1,7 @@
 // IotHub_Server/models/device.js
 
 var mongoose = require('mongoose')
+var emqxService = require('../services/emqx_service')
 var Schema = mongoose.Schema
 var Connection = require('./connection')
 
@@ -24,7 +25,8 @@ const deviceSchema = new Schema({
     secret: {
         type: String,
         required: true
-    }
+    },
+    status: String
 })
 
 // 定义 device.toJSONObject
@@ -38,7 +40,7 @@ deviceSchema.methods.toJSONObject = function() {
 
 // connected
 deviceSchema.statics.addConnection = function (event) {
-    var username_arr = event.username.split("/")
+    var username_arr = event.username.split("_")
     this.findOne({product_name: username_arr[0], device_name: username_arr[1]}, function (err, device) {
         if (err == null && device != null) {
             Connection.findOneAndUpdate({
@@ -60,7 +62,7 @@ deviceSchema.statics.addConnection = function (event) {
 
 // disconnect
 deviceSchema.statics.removeConnection = function (event) {
-    var username_arr = event.username.split("/")
+    var username_arr = event.username.split("_")
     this.findOne({product_name: username_arr[0], device_name: username_arr[1]}, function (err, device) {
         if (err == null && device != null) {
             Connection.findOneAndUpdate({
@@ -71,6 +73,14 @@ deviceSchema.statics.removeConnection = function (event) {
                 disconnect_at: Math.floor(Date.now() / 1000)
             }, {useFindAndModify: false}).exec()
         }
+    })
+}
+
+deviceSchema.methods.disconnect = function () {
+    Connection.find({device: this._id}).exec(function (err, connections) {
+        connections.forEach(function (conn) {
+            emqxService.disconnectClient(conn.client_id)
+        })
     })
 }
 

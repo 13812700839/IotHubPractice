@@ -1,5 +1,5 @@
 // lot_device.js
-"use script";
+"use strict";
 var mqtt = require('mqtt')
 const EventEmitter = require('events');
 
@@ -14,10 +14,10 @@ class IotDevice extends EventEmitter {
         this.deviceName = deviceName
         this.secret = secret
         // this.username = `${this.productName}/${this.deviceName}`
-        this.username = this.productName+'/'+this.deviceName
+        this.username = this.productName+'_'+this.deviceName
         // 根据ClientID设置
         // if (clientID!=null) this.clientIdentifier = `${this.username}/${clientID}`
-        if (clientID!=null) this.clientIdentifier = this.username+'/'+clientID
+        if (clientID!=null) this.clientIdentifier = this.username+'_'+clientID
         else this.clientIdentifier = this.username
     }
 
