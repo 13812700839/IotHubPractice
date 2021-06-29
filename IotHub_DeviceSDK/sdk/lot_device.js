@@ -3,7 +3,7 @@
 var mqtt = require('mqtt')
 const EventEmitter = require('events')
 const objectId = require('bson').ObjectId;
-var levelStore = require('mqtt-level-store')
+var levelStore = require('mqtt-level-store');
 
 class IotDevice extends EventEmitter {
     // constructor({serverAddress = "127.0.0.1:8883", productName, deviceName, secret, clientID, storePath} = {}) {
@@ -66,6 +66,16 @@ class IotDevice extends EventEmitter {
             // var topic = `upload_data/${this.productName}/${this.deviceName}/${type}/${new ObjectId.toHexString()}`
             var topic = 'upload_data/'+this.productName+'/'+this.deviceName+'/'+type+'/'+new objectId().toHexString()
             this.client.publish(topic, data, {qos: 1})
+        }
+    }
+
+    updateStatus(status) {
+        if (this.client != null) {
+            // var topic = `update_status/${this.productName}/${this.deviceName}/${new objectId().toHexString()}`
+            var topic = 'update_status/'+this.productName+'/'+this.deviceName+'/'+new objectId().toHexString()
+            this.client.publish(topic, JSON.stringify(status), {
+                qos: 1
+            })
         }
     }
 

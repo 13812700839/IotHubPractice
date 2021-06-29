@@ -4,24 +4,18 @@ const pathToRegexp = require('path-to-regexp')
 const redisClient = require('../models/redis')
 var Message = require('../models/message')
 const NotifyService = require('./notify_service')
+var Device = require('../models/device')
 
 class MessageService {
     // 提取元数据
     static dispathMessage({topic, payload, ts} = {}) {
         var dataTopicRule = 'upload_data/:productName/:deviceName/:dataType/:messageId'
+        var statusTopicRule = 'update_status/:productName/:deviceName/:messageId'
         const topicRegx = pathToRegexp(dataTopicRule)
+        const statusRegx = pathToRegexp(statusTopicRule)
         var result = null
         if ((result = topicRegx.exec(topic)) != null) {
-            var productName = result[1]
-            var deviceName = result[2]
-            var dataType = result[3]
-            var messageId = result[4]
-
-            console.log('productName :>> ', productName);
-            console.log('sdeviceName :>> ', deviceName);
-            console.log('dataType :>> ', dataType);
-            console.log('messageId :>> ', messageId);
-
+            // 处理上报数据
             this.checkMessageDuplication(result[4], function (isDup) {  
                 if (!isDup) {
                     MessageService.handleUploadData({
@@ -31,6 +25,18 @@ class MessageService {
                         messageId: result[4],
                         ts: ts,
                         payload: Buffer.from(payload, 'base64')
+                    })
+                }
+            })
+        } else if ((result = statusRegx.exec(topic))!= null) {
+            // 处理状态数据
+            this.checkMessageDuplication(result[3], function (isDup) {  
+                if(!isDup) {
+                    MessageService.handleUpdateStatus({
+                        productName: result[1],
+                        deviceName: result[2],
+                        deviceStatus: new Buffer(payload, 'base64').toString(),
+                        ts: ts
                     })
                 }
             })
@@ -62,6 +68,20 @@ class MessageService {
 
         message.save()
         NotifyService.notifyUploadData(message)
+    }
+
+    static handleUpdateStatus({productName, deviceName, deviceStatus, ts}) {
+        Device.findOneAndUpdate({product_name: productName, device_name: deviceName, 
+            '$or':[{last_status_update: {'$exists': false}}, {last_status_update: {'$lt':ts}}]},
+            {device_status: deviceStatus, last_status_update: ts}, {useFindAndModify: false}).exec(function (error, device) {  
+                if (device != null) {
+                    NotifyService.notifyUpdateStatus({
+                        productName: productName,
+                        deviceName: deviceName,
+                        deviceStatus: deviceStatus
+                    })
+                }
+            })
     }
 }
 

@@ -27,7 +27,13 @@ const deviceSchema = new Schema({
         type: String,
         required: true
     },
-    status: String
+    status: String,
+    device_status: {
+        type: String,
+        default: "{}"
+    },
+    // 最后一次更新状态时间
+    last_status_update: Number
 })
 
 // 定义 device.toJSONObject
@@ -35,7 +41,9 @@ deviceSchema.methods.toJSONObject = function() {
     return {
         product_name: this.product_name,
         device_name: this.device_name,
-        secret: this.secret
+        secret: this.secret,
+        // 查询设备状态
+        device_status: JSON.parse(this.device_status)
     }
 }
 
@@ -93,8 +101,10 @@ deviceSchema.post('remove', function (device, next) {
 
 deviceSchema.methods.getACLRule = function () {  
     const publish = [
-        // `upload_data/${this.productName}/${this.deviceName}/+/+`
-        'upload_data/'+this.productName+'/'+this.deviceName+'/+/+'
+        // `upload_data/${this.product_name}/${this.device_name}/+/+`,
+        // `update_status/${this.product_name}/${this.device_name}/+`
+        'upload_data/'+this.product_name+'/'+this.device_name+'/+/+',
+        'update_status/'+this.product_name+'/'+this.device_name+'/+'
     ]
     const subscribe = []
     const pubsub = []

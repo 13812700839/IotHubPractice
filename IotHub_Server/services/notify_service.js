@@ -5,6 +5,7 @@ var amqp = require('amqplib/callback_api')
 const bson = require('bson')
 
 var uploadDataExchange = 'iothub.events.upload_data'
+var updateStatusExchange = 'iothub.events.update_status'
 var currentChannel = null
 
 // 初始化RabbitMQ客户端
@@ -31,6 +32,16 @@ class NotifyService {
             message_id: message.message_id
         })
         if (currentChannel != null) currentChannel.publish(uploadDataExchange, message.product_name, data, {
+            persistent: true
+        })
+    }
+    static notifyUpdateStatus({productName, deviceName, deviceStatus}) {
+        var data = bson.serialize({
+            device_name: deviceName,
+            device_status: deviceStatus
+        })
+
+        if (currentChannel != null) currentChannel.publish(updateStatusExchange, productName, data, {
             persistent: true
         })
     }
