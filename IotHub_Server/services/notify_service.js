@@ -23,7 +23,6 @@ amqp.connect(process.env.RABBITMQ_URL, function (error0, connection) {
 
 class NotifyService {
     static notifyUploadData(message) {
-        console.log(message)
         var data = bson.serialize({
             device_name: message.device_name,
             payload: message.payload,

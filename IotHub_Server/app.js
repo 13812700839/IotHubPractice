@@ -26,6 +26,8 @@ var deviceRouter = require("./routes/devices")
 var tokensRouter = require('./routes/tokens')
 // 把routes/emqx_web_hook.js挂载在/emqx_web_hook下
 var webHookRouter = require('./routes/emqx_web_hook')
+// 把routes/messages.js挂载在/messages下
+var messageRouter = require('./routes/messages')
 
 var app = express()
 
@@ -45,6 +47,7 @@ app.use("/users", usersRouter)
 app.use("/devices", deviceRouter)
 app.use('/tokens', tokensRouter)
 app.use('/emqx_web_hook', webHookRouter)
+app.use('/messages', messageRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
