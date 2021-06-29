@@ -1,11 +1,13 @@
 // lot_device.js
 "use strict";
 var mqtt = require('mqtt')
-const EventEmitter = require('events');
+const EventEmitter = require('events')
+const objectId = require('bson').ObjectId;
+var levelStore = require('mqtt-level-store')
 
 class IotDevice extends EventEmitter {
-    // constructor({serverAddress = "127.0.0.1:8883", productName, deviceName, secret, clientID} = {}) {
-    constructor({serverAddress = "10.40.250.101:8883", productName, deviceName, secret, clientID} = {}) {
+    // constructor({serverAddress = "127.0.0.1:8883", productName, deviceName, secret, clientID, storePath} = {}) {
+    constructor({serverAddress = "10.40.250.101:8883", productName, deviceName, secret, clientID, storePath} = {}) {
         super();
         // this.serverAddress = `mqtt://${serverAddress}`
         // this.serverAddress = 'mqtt://'+serverAddress
@@ -19,17 +21,27 @@ class IotDevice extends EventEmitter {
         // if (clientID!=null) this.clientIdentifier = `${this.username}/${clientID}`
         if (clientID!=null) this.clientIdentifier = this.username+'_'+clientID
         else this.clientIdentifier = this.username
+        
+        if (storePath != null) this.manager = levelStore(storePath)
     }
 
     connect() {
-        this.client = mqtt.connect(this.serverAddress, {
+
+        var opts = {
             rejectUnauthorized: false,
             username: this.username,
             password: this.secret,
             // 设置ClientID 和 clean session
             clientId: this.clientIdentifier,
             clean: false
-        })
+        }
+
+        if (this.manager != null){
+            opts.incomingStore = this.manager.incoming
+            opts.outgoingStore = this.manager.outgoing
+        }
+
+        this.client = mqtt.connect(this.serverAddress, opts)
         var self = this
         this.client.on("connect", function () {
             self.emit("online")
@@ -46,6 +58,14 @@ class IotDevice extends EventEmitter {
     disconnect() {
         if (this.client != null) {
             this.client.end()
+        }
+    }
+
+    uploadData(data, type='default') {
+        if (this.client != null) {
+            // var topic = `upload_data/${this.productName}/${this.deviceName}/${type}/${new ObjectId.toHexString()}`
+            var topic = 'upload_data/'+this.productName+'/'+this.deviceName+'/'+type+'/'+new objectId().toHexString()
+            this.client.publish(topic, data, {qos: 1})
         }
     }
 

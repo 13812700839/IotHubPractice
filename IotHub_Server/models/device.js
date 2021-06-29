@@ -92,7 +92,10 @@ deviceSchema.post('remove', function (device, next) {
 })
 
 deviceSchema.methods.getACLRule = function () {  
-    const public = []
+    const publish = [
+        // `upload_data/${this.productName}/${this.deviceName}/+/+`
+        'upload_data/'+this.productName+'/'+this.deviceName+'/+/+'
+    ]
     const subscribe = []
     const pubsub = []
     return {
