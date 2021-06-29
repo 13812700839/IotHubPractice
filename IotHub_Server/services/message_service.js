@@ -3,6 +3,7 @@
 const pathToRegexp = require('path-to-regexp')
 const redisClient = require('../models/redis')
 var Message = require('../models/message')
+const NotifyService = require('./notify_service')
 
 class MessageService {
     // 提取元数据
@@ -60,6 +61,7 @@ class MessageService {
         })
 
         message.save()
+        NotifyService.notifyUploadData(message)
     }
 }
 
